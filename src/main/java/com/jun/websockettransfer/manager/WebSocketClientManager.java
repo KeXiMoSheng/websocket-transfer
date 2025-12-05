@@ -3,7 +3,7 @@ package com.jun.websockettransfer.manager;
 import com.jun.websockettransfer.client.ThirdPartyWebSocketClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.AbstractWebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
@@ -25,6 +25,7 @@ public class WebSocketClientManager {
 
     /**
      * 为用户创建并连接第三方WebSocket客户端
+     * @param userSession 用户会话
      */
     public void createThirdPartyClient(WebSocketSession userSession) {
         String userSessionId = userSession.getId();
@@ -40,8 +41,10 @@ public class WebSocketClientManager {
 
     /**
      * 转发用户消息到第三方服务器
+     * @param userSessionId 用户会话ID
+     * @param message 文本消息
      */
-    public void forwardToThirdParty(String userSessionId, TextMessage message) {
+    public void forwardMessageToThirdParty(String userSessionId, AbstractWebSocketMessage message) {
         ThirdPartyWebSocketClient client = userToThirdPartyMap.get(userSessionId);
         if (client != null && client.getThirdPartySession() != null && client.getThirdPartySession().isOpen()) {
             try {
@@ -56,9 +59,11 @@ public class WebSocketClientManager {
     }
 
     /**
-     * 转发第三方消息到用户端
+     * 转发第三方文本消息到用户端
+     * @param thirdPartySession 第三方会话
+     * @param message 文本消息
      */
-    public void forwardToUser(WebSocketSession thirdPartySession, TextMessage message) {
+    public void forwardMessageToUser(WebSocketSession thirdPartySession, AbstractWebSocketMessage message) {
         String userSessionId = thirdPartyToUserMap.get(thirdPartySession);
         if (userSessionId == null) {
             System.err.println("未找到第三方会话对应的用户");

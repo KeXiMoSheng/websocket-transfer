@@ -1,24 +1,25 @@
 package com.jun.websockettransfer.client;
 
 import com.jun.websockettransfer.manager.WebSocketClientManager;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.util.concurrent.ExecutionException;
 
 /**
  * 中转客户端：连接第三方服务器，处理第三方消息转发
  */
-public class ThirdPartyWebSocketClient extends TextWebSocketHandler {
+public class ThirdPartyWebSocketClient extends AbstractWebSocketHandler {
 
     private final String thirdPartyWsUrl;
     private final WebSocketClientManager manager;
     private final WebSocketSession userSession;
     private WebSocketSession thirdPartySession; // 第三方服务器会话
     private final StandardWebSocketClient wsClient; // WebSocket客户端
-
+    Logger logger = LoggerFactory.getLogger(ThirdPartyWebSocketClient.class);
     public ThirdPartyWebSocketClient(String thirdPartyWsUrl, WebSocketClientManager manager, WebSocketSession userSession) {
         this.thirdPartyWsUrl = thirdPartyWsUrl;
         this.manager = manager;
@@ -58,18 +59,30 @@ public class ThirdPartyWebSocketClient extends TextWebSocketHandler {
     }
 
     /**
-     * 接收第三方服务器消息 → 转发到用户端
+     * 接收第三方服务器文本消息 → 转发到用户端
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        manager.forwardToUser(session, message);
+        manager.forwardMessageToUser(session, message);
     }
-
+    /**
+     * 接收第三方服务器二进制消息 → 转发到用户端
+     */
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
+        //获取前端发送的原始二进制流
+//        ByteBuffer byteBuffer = message.getPayload();
+//        //将数据存入byte数组
+//        byte[] audioBytes = new byte[byteBuffer.remaining()];
+//        byteBuffer.get(audioBytes);
+        //模拟处理数据
+        manager.forwardMessageToUser(session, message);
+    }
     /**
      * 第三方连接关闭 → 清理用户连接
      */
     @Override
-    public void afterConnectionClosed(WebSocketSession session, org.springframework.web.socket.CloseStatus status) {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String userSessionId = manager.getUserSessionId(session);
         manager.removeUserSession(userSessionId);
         closeUserSession();
@@ -82,7 +95,7 @@ public class ThirdPartyWebSocketClient extends TextWebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
         System.err.printf("第三方连接异常：%s%n", exception.getMessage());
-        afterConnectionClosed(session, org.springframework.web.socket.CloseStatus.SERVER_ERROR);
+        afterConnectionClosed(session, CloseStatus.SERVER_ERROR);
     }
 
     /**

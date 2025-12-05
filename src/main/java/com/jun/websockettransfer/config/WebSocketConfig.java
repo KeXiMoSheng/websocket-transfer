@@ -1,6 +1,7 @@
 package com.jun.websockettransfer.config;
 
 import com.jun.websockettransfer.handler.UserWebSocketHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
-
+    @Autowired
     private final UserWebSocketHandler userWebSocketHandler;
 
     @Value("${cors.allowed-origins}")
@@ -30,13 +31,5 @@ public class WebSocketConfig implements WebSocketConfigurer {
         // 注册用户端连接端点：/ws/proxy
         registry.addHandler(userWebSocketHandler, "/ws/proxy")
                 .setAllowedOrigins(allowedOrigins.split(",")); // 跨域配置
-    }
-
-    /**
-     * 用于扫描WebSocket端点（Spring Boot 3原生WebSocket必需）
-     */
-    @Bean
-    public ServerEndpointExporter serverEndpointExporter() {
-        return new ServerEndpointExporter();
     }
 }
