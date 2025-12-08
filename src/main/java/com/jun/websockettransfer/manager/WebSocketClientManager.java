@@ -32,7 +32,7 @@ public class WebSocketClientManager {
         // 先清理旧连接
 //        removeUserSession(userId);
         // 创建新的第三方客户端并连接
-        ThirdPartyWebSocketClient client = new ThirdPartyWebSocketClient(thirdPartyWsUrl, userId);
+        ThirdPartyWebSocketClient client = new ThirdPartyWebSocketClient(thirdPartyWsUrl+"?userId="+userId, userId);
         client.connect();
     }
 
