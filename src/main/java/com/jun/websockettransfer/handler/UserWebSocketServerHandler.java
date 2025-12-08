@@ -60,6 +60,7 @@ public class UserWebSocketServerHandler extends AbstractWebSocketHandler {
         }
         // 转发消息到第三方服务器
         WebsocketUtil.sendMessage(thirdPartySession, message);
+        System.out.println("用户["+userId+"]被中转至第三方服务器："+message.getPayload());
     }
     /**
      * 处理前端发送的 PCM 音频二进制流
