@@ -10,7 +10,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.Map;
 
 /**
- * 维护用户会话与第三方客户端的映射关系，实现消息路由
+ * 用于管理用户会话与第三方客户端,创建第三方客户端连接,关闭第三方客户端连接
  */
 @Component
 public class WebSocketClientManager {
