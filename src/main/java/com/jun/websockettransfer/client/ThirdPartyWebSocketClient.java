@@ -80,12 +80,11 @@ public class ThirdPartyWebSocketClient extends AbstractWebSocketHandler {
     }
 
     /**
-     * 处理第三方连接异常
+     * 处理第三方
      */
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
         System.err.printf("第三方连接异常：%s%n", exception.getMessage());
-        afterConnectionClosed(session, CloseStatus.SERVER_ERROR);
     }
 
 
