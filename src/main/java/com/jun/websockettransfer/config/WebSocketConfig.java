@@ -1,6 +1,6 @@
 package com.jun.websockettransfer.config;
 
-import com.jun.websockettransfer.handler.UserWebSocketHandler;
+import com.jun.websockettransfer.handler.UserWebSocketServerHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -15,19 +15,19 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
     @Autowired
-    private final UserWebSocketHandler userWebSocketHandler;
+    private final UserWebSocketServerHandler userWebSocketServerHandler;
 
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
 
-    public WebSocketConfig(UserWebSocketHandler userWebSocketHandler) {
-        this.userWebSocketHandler = userWebSocketHandler;
+    public WebSocketConfig(UserWebSocketServerHandler userWebSocketServerHandler) {
+        this.userWebSocketServerHandler = userWebSocketServerHandler;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // 注册用户端连接端点：/ws/proxy
-        registry.addHandler(userWebSocketHandler, "/ws/proxy")
+        registry.addHandler(userWebSocketServerHandler, "/ws/proxy")
                 .setAllowedOrigins(allowedOrigins.split(",")); // 跨域配置
     }
 }
